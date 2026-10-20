@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskFlow | Task Manager</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/"><span class="brand-icon">✓</span> TaskFlow</a>
+    <span class="tag">PERSONAL PRODUCTIVITY</span>
+  </header>
+  <main class="container">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">YOUR WORKSPACE</p>
+        <h1>Make room for <span>great work.</span></h1>
+        <p class="subheading">A clear mind starts with a clear plan. Capture tasks, track progress, and keep moving.</p>
+      </div>
+      <div class="hero-mark">TF<span>.</span></div>
+    </section>
+
+    <section class="stats">
+      <div class="stat-card"><span class="stat-label">ALL TASKS</span><strong>{{ total }}</strong><span class="stat-note">In your workspace</span></div>
+      <div class="stat-card"><span class="stat-label">COMPLETED</span><strong>{{ completed }}</strong><span class="stat-note">Progress made</span></div>
+      <div class="stat-card"><span class="stat-label">PENDING</span><strong>{{ pending }}</strong><span class="stat-note">Ready when you are</span></div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel add-panel">
+        <div class="section-heading"><div><p class="eyebrow">GET STARTED</p><h2>Add a task</h2></div><span class="plus">＋</span></div>
+        <form action="/tasks" method="post">
+          <label for="title">Task title</label>
+          <input id="title" name="title" maxlength="120" placeholder="e.g. Finish project report" required>
+          <label for="description">Description <span class="optional">(optional)</span></label>
+          <textarea id="description" name="description" rows="3" maxlength="500" placeholder="Add a few details..."></textarea>
+          <button class="primary-btn" type="submit">＋ &nbsp; Add task</button>
+        </form>
+        <p class="helper">Your tasks are saved locally in the application database.</p>
+      </div>
+
+      <div class="panel tasks-panel">
+        <div class="section-heading"><div><p class="eyebrow">YOUR LIST</p><h2>Tasks <span class="count">{{ total }}</span></h2></div><span class="list-icon">☷</span></div>
+        {% if tasks %}
+          <div class="task-list">
+          {% for task in tasks %}
+            <article class="task {% if task.completed %}is-complete{% endif %}">
+              <form action="/tasks/{{ task.id }}/toggle" method="post" class="toggle-form">
+                <button class="check" type="submit" aria-label="Toggle completion">{% if task.completed %}✓{% endif %}</button>
+              </form>
+              <div class="task-content">
+                <h3>{{ task.title }}</h3>
+                {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+                <span class="status {% if task.completed %}done{% else %}pending{% endif %}">{% if task.completed %}COMPLETED{% else %}IN PROGRESS{% endif %}</span>
+              </div>
+              <form action="/tasks/{{ task.id }}/delete" method="post" onsubmit="return confirm('Delete this task?')">
+                <button class="delete-btn" type="submit" aria-label="Delete task" title="Delete task">×</button>
+              </form>
+            </article>
+          {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state"><div class="empty-icon">✦</div><h3>Your next win starts here.</h3><p>Add your first task using the form. Small steps make big progress.</p></div>
+        {% endif %}
+      </div>
+    </section>
+    <footer><span>TaskFlow</span> · Built for focus, delivered with care. <span class="live-dot"></span> App online</footer>
+  </main>
+</body>
+</html>
