@@ -1,23 +1,47 @@
+
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
-            steps { checkout scm }
+            steps {
+                checkout scm
+            }
         }
+
+        stage('Check Environment') {
+            steps {
+                sh 'echo "TaskFlow CI/CD Pipeline Started"'
+                sh 'python3 --version'
+                sh 'docker --version'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
-                bat 'py -m pip install -r requirements.txt'
+                sh 'python3 -m pip install -r requirements.txt'
             }
         }
+
         stage('Automated Tests') {
             steps {
-                bat 'py -m pytest -q'
+                sh 'python3 -m pytest -q'
             }
         }
+
         stage('Docker Build') {
             steps {
-                bat 'docker build -t taskflow:latest .'
+                sh 'docker build -t taskflow:latest .'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'SUCCESS: Tests passed and Docker image built.'
+        }
+        failure {
+            echo 'FAILED: Check Console Output for the error.'
         }
     }
 }
